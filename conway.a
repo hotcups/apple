@@ -6,6 +6,7 @@
 ; from https://github.com/thelbane/ConwayII
 
 
+HImem=$1374
 	processor 6502
 ZPA0          equ $06
 ZPA1          equ $07
@@ -34,18 +35,19 @@ TXTPG1        equ $0800
 CLICK         equ $C035
 HOME          equ $FC58
 RDKEY         EQU $FD0C
-COUT          equ $FDED - 0 + 0 + 1
-OUTPORT       equ $FE95 + 0
+COUT          equ $FDED
+OUTPORT       equ $FE95
 
 EXITDOS       equ $03D0
 
               mac LOG_REGION
-              if {3} && >. != >{2}
-              echo "(",{3},"-",.,")",{2},"*** BOUNDARY CROSSED ***"
-              equ $FDED
-              else
-              echo "(",{3},"-",.,")",{2}
-              equ $0400
+              if 0 != 1
+HIGHMEM=$100
+  
+
+              else 
+HIGHMEM=$1374
+
               endif
               endm
 
@@ -54,9 +56,9 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 1                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 0                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                          ; 0 = Glider gun, 1 = "Random"
-TEST_PERF       equ                          ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
+TEST_PERF       equ 0                        ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
 ; ------------------------------------
 ; Constants
@@ -78,7 +80,7 @@ currentPage     equ ZPA2
 temp            equ ZPA3
 
 fieldWidth      equ 41
-fieldHeight     equ 23+1
+fieldHeight     equ 24
 
 dataWidth       equ fieldWidth+1
 dataHeight      equ fieldHeight+1
@@ -188,10 +190,10 @@ perfTest        subroutine
 iterate         subroutine
                 jsr toggleDataPages
                 jsr clearBorders
-                lda #fieldHeight-1+2
+                lda #fieldHeight
                 sta .row
 .rowLoop        jsr getTextRow
-                lda #fieldWidth-1+1
+                lda #fieldWidth
                 sta .column
                 lda #0
                 ldy #y_top                      ; clean up stale data
