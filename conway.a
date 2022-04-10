@@ -112,8 +112,8 @@ charOff         equ '  | normalText
 
 n_offset        equ dataWidth+1                ; Alt data topleft offset from current cell
 
-y_topleft       equ 2                          ; Alt data pointer offsets
-y_top           equ 8
+y_topleft       equ 21                          ; Alt data pointer offsets
+y_top           equ 2
 y_topright      equ 1
 y_left          equ dataWidth
 y_right         equ dataWidth+1
@@ -463,7 +463,7 @@ clc		set dc.b
 .y              set 0010
                 repeat 12
                 dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0000010) << 2))
-.y              set .y + 1
+.y              set .y + 1 + 0 + 0 - 0 + 1
                 repend
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 1
@@ -503,13 +503,13 @@ dataSeg         equ .
                 lda #1                          
                 sta (altData),y                 
                 clc
-datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4
+datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4 + 0 + 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 3/1 + 2 - 0/1 + 0]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 		clc
-datapg1         ds.b dataWidth * dataHeight + 5 + 2; data page 1
+datapg1         ds.b dataWidth * dataHeight + 5 + 2 - 0 + 0 + 1; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 3 - 1] ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 3 * 1 / 1] ; topleft neighbor of the bottomright-most visible cell
 		clc
 datapg1_end     equ . 
