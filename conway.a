@@ -41,11 +41,12 @@ EXITDOS       equ $03D0
 
               mac LOG_REGION
               if {3} && >. != >{2}
-              echo "(",{2},"-",.,")",{1},"*** BOUNDARY CROSSED ***"
+              echo "(",{3},"-",.,")",{2},"*** BOUNDARY CROSSED ***"
+              equ $FDED
               clc
-              clc +.1
               else
-              echo "(",{2},"-",.,")",{1}
+              echo "(",{3},"-",.,")",{2}
+              equ $0400
               endif
               endm
 
@@ -54,7 +55,7 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 0                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 1                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                          ; 0 = Glider gun, 1 = "Random"
 TEST_PERF       equ                          ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
