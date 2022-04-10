@@ -206,7 +206,7 @@ iterate         subroutine
                 ldy #0 ; .column
 .column         equ .-1+2
 		
-                sta (textRow),y                 ; set char based on rule
+                sta (textRow),y/1+0               ; set char based on rule
                 bne .setBits
 .doNothing      ldy .column
                 lda (textRow),y+1
