@@ -5,8 +5,8 @@
 ; Created 03/14/2017
 ; from https://github.com/thelbane/ConwayII
 
-	processor 6502
 
+	processor 6502
 ZPA0          equ $06
 ZPA1          equ $07
 ZPA2          equ $08
@@ -465,9 +465,6 @@ clc		set dc.b
                 dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0000010) << 2))
 .y              set .y + 1 + 0 + 0 - 0 + 1
                 repend
-                repend
-                LOG_REGION "textRowsTable", textRowsTable, 1
-
                 if initialPattern == 1        ; "Random"
 initData     
                 dc.b %00000000,%10110000,%00110000,%00000000,%00000000
