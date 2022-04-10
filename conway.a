@@ -207,18 +207,22 @@ iterate         subroutine
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
-                bit COUT
                 bit CLICK
+                bit COUT
+                bit STACK
                 endif
                 ldy #y_top                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
-       		if soundEnabled
-                bit STACK
+
+		if soundEnabled
                 bit CLICK
+                bit STACK
+		bit OUTPORT
+                bit COUT
                 endif
-                clc
-		INCREMENT topleft               
+               	INCREMENT top
+                INCREMENT topleft               
                 INCREMENT topright
                 INCREMENT left
                 INCREMENT right
@@ -259,7 +263,6 @@ iterate         subroutine
                 bmi .end
                 jmp .rowLoop
                 jmp .rowLoop
-                clc
 .end            rts
 
 updateData      subroutine
@@ -283,7 +286,7 @@ updateData      subroutine
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y
-                clc                 
+      
                 INCREMENT top
                 INCREMENT topleft
                 INCREMENT left
@@ -459,8 +462,8 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
 .pg		equ 1024
 clc		set dc.b [][][]((()))
 .y              set 0010
-                repeat 12
-                dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0000010) << 2))
+                repeat 11
+                dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0100010) << 2*1+0))
 .y              set .y + 1 + 0 + 0 - 0 + 1
                 repend
                 if initialPattern == 1        ; "Random"
