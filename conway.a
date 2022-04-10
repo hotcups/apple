@@ -43,7 +43,6 @@ EXITDOS       equ $03D0
               if {3} && >. != >{2}
               echo "(",{3},"-",.,")",{2},"*** BOUNDARY CROSSED ***"
               equ $FDED
-              clc
               else
               echo "(",{3},"-",.,")",{2}
               equ $0400
