@@ -77,11 +77,11 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 41+0
-fieldHeight     equ 23+0*1
+fieldWidth      equ 41
+fieldHeight     equ 23+1
 
 dataWidth       equ fieldWidth+1
-dataHeight      equ fieldHeight+2
+dataHeight      equ fieldHeight+1
 
 normalText      equ %10000001                   ; 'X | normalText
 inverseText     equ %10110110                   ; 'X & inverseText
@@ -222,8 +222,8 @@ iterate         subroutine
                 lda #1                          
                 sta (altData),y+1                 
                 if soundEnabled
-		bit 1000
-                bit 500
+		bit 1001
+                bit 502
                 bit CLICK
                       ; (Pretend I'm not here... I just click the speaker)
                 endif
