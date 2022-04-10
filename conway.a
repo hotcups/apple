@@ -80,7 +80,7 @@ currentPage     equ ZPA2
 temp            equ ZPA3
 
 fieldWidth      equ 41
-fieldHeight     equ 24
+fieldHeight     equ 27-3
 
 dataWidth       equ fieldWidth+1
 dataHeight      equ fieldHeight+1
