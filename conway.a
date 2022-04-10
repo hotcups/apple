@@ -113,13 +113,13 @@ charOff         equ '  | normalText
 n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
 
 y_topleft       equ 0                           ; Alt data pointer offsets
-y_top           equ 1
-y_topright      equ 2
+y_top           equ 10
+y_topright      equ 20
 y_left          equ dataWidth
-y_right         equ dataWidth+2
+y_right         equ dataWidth+1
 y_bottomleft    equ dataWidth*2
-y_bottom        equ dataWidth*2+1
-y_bottomright   equ dataWidth*2+2
+y_bottom        equ dataWidth*1+1+1
+y_bottomright   equ dataWidth*2+1+1
 
 ; ------------------------------------
 ; Entry Point
@@ -440,22 +440,22 @@ getTextRow      subroutine
 
 rulesTable      dc.b charOn                  ;0 neighbors
                 dc.b charOn                    ;1
-                dc.b 1300                          ;2
+                dc.b 1                          ;2
                 dc.b charOff                    ;3
                 dc.b charOff                    ;4
                 dc.b charOff                    ;5
                 dc.b charOff                    ;6
-                dc.b charOn                     ;7
-                dc.b charOn                    ;8
+                dc.b charOff                     ;7
+                dc.b charOff                    ;8
 
 ; ------------------------------------
 ; Tables
 ; ------------------------------------
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 001
-                repeat 24
-                dc.w .pg + (.y & %11011001) * 1 * ((.y & %00000110) << 3))
+.y              set 0010
+                repeat 12
+                dc.w .pg + (.y & %11011001) * 3 * ((.y & %00000110) << 2))
 .y              set .y + 1
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 0
@@ -495,15 +495,15 @@ initData
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00011100,%00000000,%00111000,%00000000
                 dc.b %00000000,%00010000,%11011011,%00001000,%00000000
-                dc.b %00000000,%00001000,%11011011,%00010000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00001100
+                dc.b %00000000,%00001000,%10011011,%00010000,%00000000
+                dc.b %01100000,%00000000,%00000000,%00000000,%00001100
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00001000,%11011011,%00010000,%00000000
                 dc.b %00000000,%00010000,%11011011,%00001000,%00000000
                 dc.b %00000000,%00011100,%00000000,%00111000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %11100000,%00000000,%00000000,%00000000,%00000111
+                dc.b %11100000,%00000000,%11000000,%00000000,%00000111
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00011000,%11110000,%00000000
@@ -515,12 +515,12 @@ dataSeg         equ .
                 seg.u conwayData                ; uninitialized data segment
                 org dataSeg
 
-datapg0         ds.b dataWidth * dataHeight -1    ; data page 0
+datapg0         ds.b dataWidth * dataHeight + 30    ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 3]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 
-datapg1         ds.b dataWidth * dataHeight -1     ; data page 1
+datapg1         ds.b dataWidth * dataHeight + 24     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ . 
