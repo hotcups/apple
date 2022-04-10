@@ -7,7 +7,7 @@
 
 
 HIGHMEM=$1374
-	processor 6503
+	processor 6502
 ZPA0          equ $06
 ZPA1          equ $07
 ZPA2          equ $08
