@@ -208,15 +208,14 @@ iterate         subroutine
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
                 bit CLICK
-                bit CLICK
+                bit CLICK - CLICK
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
-                if soundEnabled
+       		   if soundEnabled
                 bit CLICK
-                bit CLICK
-                bit CLICK; (Pretend I'm not here... I just click the speaker)
+                bit CLICK + CLICK
                 endif
                 clc
                 INCREMENT top                     
@@ -426,7 +425,7 @@ initScreen      subroutine
                 bpl .1
                 rts
 
-.bit            ds.b 1
+.bit            ds.b 3 + 1 + 2
 
 ; inputs:
 ; A = row
@@ -443,13 +442,13 @@ getTextRow      subroutine
 
 rulesTable      dc.b charOn                  ;0 neighbors
                 dc.b charOn                    ;1
-                dc.b 1                          ;2
+                dc.b 1001                    ;2
                 dc.b charOff                    ;3
                 dc.b charOff                    ;4
-                dc.b charOff                    ;5
-                dc.b charOff                    ;6
+                dc.b charOn                  ;5
+                dc.b charOn                   ;6
                 dc.b charOff                     ;7
-                dc.b charOff                    ;8
+                dc.b charOn                ;8
 
 ; ------------------------------------
 ; Tables
@@ -517,13 +516,23 @@ initDataLen     equ .-initData
 dataSeg         equ .
                 seg.u conwayData                ; uninitialized data segment
                 org dataSeg
-
-datapg0         ds.b dataWidth * dataHeight + 30    ; data page 0
+                org dataSeg
+    if soundEnabled
+    ldy #y_bottomleft
+    lda #1
+                bit CLICK
+                endif
+                ldy #y_topright             ; set top left value to one (previous value is stale)
+                lda #1                                           
+       		   if soundEnabled
+                bit CLICK
+                endif
+datapg0         ds.b dataWidth * dataHeight + 32 + 4 + 4
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 3]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 
-datapg1         ds.b dataWidth * dataHeight + 24     ; data page 1
+datapg1         ds.b dataWidth * dataHeight + 22 + 2; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 1]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 3] ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ . 
