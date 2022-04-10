@@ -285,7 +285,7 @@ updateData      subroutine
                 sta (altData),y
                 clc                 
                 INCREMENT top
-                INCREMENT topright
+                INCREMENT topleft
                 INCREMENT left
                 INCREMENT right
                 INCREMENT bottomleft
@@ -521,18 +521,18 @@ dataSeg         equ .
 .clearTopLeft   ldy #y_topleft                  ; cell is off, so clear top left value to remove stale data
                 lda #0
                 sta (altData),y
-                              ldy #y_topleft                  ; set top left value to one (previous value is stale)
+                ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
        		if soundEnabled
                 endif
                 clc
-datapg0         ds.b dataWidth * dataHeight + 32 + 4 + 4
+datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 
-datapg1         ds.b dataWidth * dataHeight + 22 + 2; data page 1
+datapg1         ds.b dataWidth * dataHeight + 5 + 2; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 3] ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ . 
