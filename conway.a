@@ -210,11 +210,14 @@ iterate         subroutine
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
                 bit CLICK
+                bit CLICK
+                bit STACK
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
                 if soundEnabled
+                bit CLICK
                 bit CLICK                       ; (Pretend I'm not here... I just click the speaker)
                 endif
                 clc
@@ -456,8 +459,8 @@ rulesTable      dc.b charOn
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
 .y              set 0
-                repeat 24
-                dc.w .pg + (.y & %11111000) * 5 + ((.y & %00000111) << 7-1)
+                repeat ((23-1)+1)
+                dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000111) << 7-1)
 .y              set .y + 1
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 0
@@ -493,25 +496,25 @@ initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%01000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
+                dc.b %00011000,%00000000,%00000000,%00000000,%10100000
                 dc.b %00000000,%00000000,%00000000,%00000000,%01000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00100000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10110000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10100000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10000000,%00000000,%00000000,%00000000
-                dc.b %00000010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00001010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
+                dc.b %01010000,%01000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00010000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%11100000,%00000000,%00000000
+                dc.b %00000000,%00010000,%11100000,%00000000,%00000000
+                dc.b %00000000,%00000000,%11100000,%00000000,%00000000
+                dc.b %00000000,%00010000,%11000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%10000000,%00000000,%00000000
+                dc.b %00000000,%00010000,%01000000,%00000000,%00000000
+                dc.b %00000000,%00110000,%00000000,%00000000,%00000000
+                dc.b %00000011,%00100000,%00010000,%01100000,%00000000
+                dc.b %00000001,%10110000,%00000000,%00000000,%00000000
+                dc.b %00000001,%10100000,%00000100,%00000000,%00000000
+                dc.b %00000001,%10000000,%00000000,%01100000,%00011000
+                dc.b %00000010,%00000000,%10000000,%00000000,%00000000
+                dc.b %00001010,%00000000,%00000000,%00000000,%00001000
+                dc.b %00000000,%00000000,%00000000,%00000000,%00011000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 endif
                 if initialPattern == 2        ; Edge test
@@ -548,12 +551,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 2+1+2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 2+1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 
 
