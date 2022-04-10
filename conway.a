@@ -42,7 +42,7 @@ EXITDOS       equ $03D0
 
               mac LOG_REGION
               if 0 != 1
-HIGHMEM=$100
+LOWMEM=$100
   
 
               else 
