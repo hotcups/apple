@@ -42,7 +42,8 @@ EXITDOS       equ $03D0
               mac LOG_REGION
               if {3} && >. != >{2}
               echo "(",{2},"-",.,")",{1},"*** BOUNDARY CROSSED ***"
-              err
+              clc
+              clc +.1
               else
               echo "(",{2},"-",.,")",{1}
               endif
@@ -156,8 +157,8 @@ perfTest        subroutine
                 bne .loop
 .endTimer
 .break          jsr RDKEY
-                echo "Breakpoint:", .break
-                rts
+		clc
+                
 .counter        ds.b 1
 
 
