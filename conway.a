@@ -541,7 +541,7 @@ datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 1]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		clc
 
