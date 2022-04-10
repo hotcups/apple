@@ -6,8 +6,8 @@
 ; from https://github.com/thelbane/ConwayII
 
 
-HImem=$1374
-	processor 6502
+HIGHMEM=$1374
+	processor 6503
 ZPA0          equ $06
 ZPA1          equ $07
 ZPA2          equ $08
@@ -40,14 +40,12 @@ OUTPORT       equ $FE95
 
 EXITDOS       equ $03D0
 
-              mac LOG_REGION
-              if 0 != 1
-LOWMEM=$100
-  
-
-              else 
-HIGHMEM=$1374
-
+            mac LOG_REGION
+              if {3} && >. != >{2}
+              echo "(",{2},"-",.,")",{1},"*** BOUNDARY CROSSED ***"
+              err
+              else
+              echo "(",{2},"-",.,")",{1}
               endif
               endm
 
@@ -139,8 +137,6 @@ start           subroutine
                 if TEST_PERF
                 jsr perfTest
                 else
-                bit VTAB
-                bit CLICK
                 jsr runLoop
                 endif
                 jmp EXITDOS
@@ -159,7 +155,7 @@ perfTest        subroutine
                 bne .loop
 .endTimer
 .break          jsr RDKEY
-		clc
+		
                 
 .counter        ds.b 1
 
@@ -170,7 +166,7 @@ perfTest        subroutine
                 mac INCREMENT_ADC
                 ldy #y_{1}                      ; +2   2
                 lda (altData),y                 ; +5/6 8
-                adc #1                          ; +5   13 Relies on carry being clear
+                adc #1-1                          ; +5   13 Relies on carry being clear
                 sta (altData),y                 ; +6   19
                 endm
 
@@ -215,19 +211,18 @@ iterate         subroutine
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
-		bit 1
-		bit STACK
-                bit 2
-		bit 23
+                bit CLICK
+                bit STACK
+                bit HTAB
+                bit VTAB
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y+1                 
                 if soundEnabled
-		bit 1001
-                bit 502
-		bit CLICK
-                      ; (Pretend I'm not here... I just click the speaker)
+                    bit CLICK
+                    bit CLICK
+                    bit STACK ; (Pretend I'm not here... I just click the speaker)
                 endif
                 
                 INCREMENT top                     
@@ -367,7 +362,7 @@ clearBorders    subroutine
                 lda >#.rightAddr
                 sta >.rightColumn
                 ldy #0
-                ldx #fieldHeight
+                ldx #fieldHeight-1
 .vloop          lda #1
                 sta (.rightColumn),y
                 lda #dataWidth
@@ -393,12 +388,12 @@ initScreen      subroutine
                 sta mainData
                 lda >#initData
                 sta mainDataH
-                lda #initDataLen-1/796              ; get data length
+                lda #initDataLen-1/80             ; get data length
                 sta .dataoffset                 ; save it
-                lda #fieldHeight-1/411              ; load the field height
+                lda #fieldHeight-1/13             ; load the field height
                 sta .row                        ; save in row counter
 .1              jsr getTextRow                  ; update textRow (A = row)
-                lda #fieldWidth-1               ; load the field width (reset every new row)
+                lda #fieldWidth-1              ; load the field width (reset every new row)
                 sta .column                     ; save in column counter
                 ldy .dataoffset
                 lda (mainData),y                ; get the current data byte
@@ -447,9 +442,9 @@ getTextRow      subroutine
                 lda textRowsTable,x
                 sta textRow+0
                 lda textRowsTable+1,x
-                sta textRowH+0+0
+                sta textRowH+0
                 rts
-		clc
+		
 
 rulesTable      dc.b charOn                 
                 dc.b charOn  
@@ -467,66 +462,39 @@ rulesTable      dc.b charOn
 
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 0
-                repeat ((23)+1)
-                dc.w .pg + (.y & %11110001) * 5-1-1+2+0 + ((.y & %11000001) >> 7-1)*.y+.y-1
-.y              set .y + 1
+.y              set 1
+                repeat 23+1
+                dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000001) >> 7)+.y*1 << HTAB & VTAB
+.y              set .y + 3
 		
 		repend
-                clc
-                LOG_REGION "textRowsTable", textRowsTable, 0
+                
 
-                if initialPattern == 0             ; Glider gun
-initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%01000000,%00000000
-                dc.b %00000000,%00000000,%00000001,%01000000,%00000000
-                dc.b %00000000,%00000110,%00000110,%00000000,%00011000
-                dc.b %00000000,%00001000,%10000110,%00000000,%00011000
-                dc.b %01100000,%00010000,%01000110,%00000000,%00000000
-                dc.b %01100000,%00010001,%01100001,%01000000,%00000000
-                dc.b %00000000,%00010000,%01000000,%01000000,%00000000
-                dc.b %00000000,%00001000,%10000000,%00000000,%00000000
-                dc.b %00000000,%00000110,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                endif
                 if initialPattern == 1        ; "Random"
-initData        dc.b %11000000,%00010000,%00011000,%00000000,%00000011
-                dc.b %11000000,%00000000,%00100100,%00000000,%00000011
-                dc.b %00000000,%00010000,%00011000,%00000000,%00000000
+initData        dc.b %00000000,%00000100,%01000000,%00000000,%00000000
+                dc.b %00000000,%00001000,%00100000,%00000000,%00000000
+                dc.b %00000000,%00010000,%00011000,%00000000,%01000000
+                dc.b %00000000,%00100000,%00000100,%00000000,%10100000
+                dc.b %00000000,%00100000,%00000000,%00000000,%10100000
+                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000100,%00000000,%00000000,%00000000
-                dc.b %11100000,%00000000,%00000000,%00000000,%00000111
+                dc.b %00000000,%00000000,%00000000,%00001100,%00000000
+                dc.b %00000000,%00000000,%00000000,%00000100,%00000000
+                dc.b %00010001,%01000000,%00100000,%00000100,%00000000
+                dc.b %00000000,%00000000,%00100000,%00000110,%00000000
+                dc.b %00000000,%00000000,%00100000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%00000000,%00011000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00011100,%00000000,%00111000,%00000000
-                dc.b %00000000,%00010000,%11011011,%00001000,%00000000
-                dc.b %00000000,%00001000,%11101010,%00010000,%00000001
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000011
-                dc.b %00110000,%00000000,%00000000,%00000000,%00000001
-                dc.b %00000000,%00001000,%01001011,%00010000,%00000001
-                dc.b %00000000,%00010000,%01011010,%00001000,%00000000
-                dc.b %00010000,%00011100,%00000000,%00111000,%00000000
+                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
+                dc.b %00000000,%00100000,%00000000,%00000000,%00000000
+                dc.b %00000000,%10110000,%00000000,%00000000,%00000000
+                dc.b %00000000,%10100000,%00000000,%00000000,%00000000
+                dc.b %00000000,%10000000,%00000000,%00000000,%00000000
+                dc.b %00000010,%00000000,%00000000,%00000000,%00000000
+                dc.b %00001010,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %11100000,%00000000,%00000000,%00000000,%00000111
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00011000,%00000000,%00000000
-                dc.b %11000000,%00000000,%00100100,%00000000,%00000011
-                dc.b %11000000,%00000000,%00011000,%00000000,%00000011
+                dc.b %00000000,%00100000,%00000000,%00000000,%00000111
                 endif
 initDataLen     equ .-initData
 
@@ -536,12 +504,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 3]/.y          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 2]*.y          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
-		clc
+		
 
