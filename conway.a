@@ -113,8 +113,8 @@ charOff         equ '  | normalText
 n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
 
 y_topleft       equ 0                           ; Alt data pointer offsets
-y_top           equ 10
-y_topright      equ 20
+y_top           equ 24
+y_topright      equ 32
 y_left          equ dataWidth
 y_right         equ dataWidth+1
 y_bottomleft    equ dataWidth*2
@@ -199,7 +199,7 @@ iterate         subroutine
                 lda rulesTable,y                ; convert bit flags to cell state character (or 0 for do nothing)
                 beq .doNothing                  ; rule says do nothing, so update the neighbor data
                 ldy #0 ; .column
-.column         equ .-1
+.column         equ . -1
                 sta (textRow),y                 ; set char based on rule
                 bne .setBits
 .doNothing      ldy .column
@@ -208,17 +208,17 @@ iterate         subroutine
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
                 bit CLICK
-                bit CLICK - CLICK
+                bit CLICK / CLICK + 2
                 endif
-                ldy #y_topleft                  ; set top left value to one (previous value is stale)
+                ldy #y_top                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
-       		   if soundEnabled
+       		if soundEnabled
                 bit CLICK
-                bit CLICK + CLICK
+                bit CLICK * CLICK - 1
                 endif
                 clc
-                INCREMENT top                     
+		INCREMENT top                    
                 INCREMENT topright
                 INCREMENT left
                 INCREMENT right
@@ -258,6 +258,8 @@ iterate         subroutine
 .row            equ .-1
                 bmi .end
                 jmp .rowLoop
+                jmp .rowLoop
+                clc
 .end            rts
 
 updateData      subroutine
@@ -516,17 +518,15 @@ initDataLen     equ .-initData
 dataSeg         equ .
                 seg.u conwayData                ; uninitialized data segment
                 org dataSeg
-                org dataSeg
-    if soundEnabled
-    ldy #y_bottomleft
-    lda #1
-                bit CLICK
+.clearTopLeft   ldy #y_topleft                  ; cell is off, so clear top left value to remove stale data
+                lda #0
+                sta (altData),y
+                              ldy #y_topleft                  ; set top left value to one (previous value is stale)
+                lda #1                          
+                sta (altData),y                 
+       		if soundEnabled
                 endif
-                ldy #y_topright             ; set top left value to one (previous value is stale)
-                lda #1                                           
-       		   if soundEnabled
-                bit CLICK
-                endif
+                clc
 datapg0         ds.b dataWidth * dataHeight + 32 + 4 + 4
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomright-most visible cell
