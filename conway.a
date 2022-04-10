@@ -502,7 +502,7 @@ dataSeg         equ .
                 clc
 datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4 + 0 + 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 3/1 + 2 - 0/1 + 0]     ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset + 3/1 + 2 * 0/1 + 0]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 		clc
 datapg1         ds.b dataWidth * dataHeight + 5 + 2 - 0 + 0 + 1; data page 1
