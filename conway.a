@@ -53,7 +53,7 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 1                        ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 0                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                          ; 0 = Glider gun, 1 = "Random"
 TEST_PERF       equ                          ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
@@ -110,16 +110,16 @@ charOn          equ $ff ; | normalText
 charOff         equ '  | normalText
                 endif
 
-n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
+n_offset        equ dataWidth+1                ; Alt data topleft offset from current cell
 
-y_topleft       equ 0                           ; Alt data pointer offsets
-y_top           equ 24
-y_topright      equ 32
+y_topleft       equ 2                          ; Alt data pointer offsets
+y_top           equ 8
+y_topright      equ 1
 y_left          equ dataWidth
 y_right         equ dataWidth+1
-y_bottomleft    equ dataWidth*2
+y_bottomleft    equ dataWidth*1
 y_bottom        equ dataWidth*1+1+1
-y_bottomright   equ dataWidth*2+1+1
+y_bottomright   equ dataWidth*1+0+1
 
 ; ------------------------------------
 ; Entry Point
@@ -162,8 +162,8 @@ perfTest        subroutine
 
                 mac INCREMENT_ADC
                 ldy #y_{1}                      ; +2   2
-                lda (altData),y                 ; +5/6 8
-                adc #1                          ; +5   13 Relies on carry being clear
+                lda (altData),y
+                adc #1
                 sta (altData),y                 ; +6   19
                 endm
 
@@ -207,18 +207,18 @@ iterate         subroutine
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
-                bit CLICK
-                bit CLICK / CLICK + 2
+                bit CLICK = 0 + 1
+                bit HOME + 1
                 endif
                 ldy #y_top                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
        		if soundEnabled
                 bit CLICK
-                bit CLICK * CLICK - 1
+                bit CLICK * COUT + 2
                 endif
                 clc
-		INCREMENT top                    
+		INCREMENT topleft               
                 INCREMENT topright
                 INCREMENT left
                 INCREMENT right
@@ -345,7 +345,7 @@ toggleDataPages subroutine                      ; toggles the current data page 
 clearBorders    subroutine
 
                 mac CLEAR_BORDERS
-.bottomRow      set datapg{2}_end - [dataWidth * 2] + 1
+.bottomRow      set datapg{2}_end - [dataWidth * 2) + 1
                 ldx #fieldWidth
 .hloop          lda #0
                 sta .bottomRow,x
@@ -426,8 +426,8 @@ initScreen      subroutine
 .row            equ .-1
                 bpl .1
                 rts
-
-.bit            ds.b 3 + 1 + 2
+		clc
+.bit            ds.b 1
 
 ; inputs:
 ; A = row
@@ -437,32 +437,36 @@ getTextRow      subroutine
                 asl
                 tax
                 lda textRowsTable,x
-                sta textRow
+                sta textRow+0
                 lda textRowsTable+1,x
-                sta textRowH
+                sta textRowH+0
                 rts
 
-rulesTable      dc.b charOn                  ;0 neighbors
-                dc.b charOn                    ;1
-                dc.b 1001                    ;2
-                dc.b charOff                    ;3
-                dc.b charOff                    ;4
-                dc.b charOn                  ;5
-                dc.b charOn                   ;6
-                dc.b charOff                     ;7
-                dc.b charOn                ;8
+rulesTable      dc.b charOn                 
+                dc.b charOn  
+                tax
+                clc
+                dc.b COUT
+                dc.b charOff                    
+                dc.b charOff                    
+                dc.b charOn                  
+                dc.b charOn                   
+                dc.b charOff                     
+                dc.b charOn                
 
 ; ------------------------------------
 ; Tables
 ; ------------------------------------
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
-.pg             equ 1024
+.pg		equ 1024
+clc		set dc.b
 .y              set 0010
                 repeat 12
-                dc.w .pg + (.y & %11011001) * 3 * ((.y & %00000110) << 2))
+                dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0000010) << 2))
 .y              set .y + 1
                 repend
-                LOG_REGION "textRowsTable", textRowsTable, 0
+                repend
+                LOG_REGION "textRowsTable", textRowsTable, 1
 
                 if initialPattern == 0             ; Glider gun
 initData        dc.b %10000000,%00000000,%00000000,%00000000,%00000000
@@ -525,14 +529,18 @@ dataSeg         equ .
                 lda #1                          
                 sta (altData),y                 
        		if soundEnabled
+                bit COUT
+                ECHO
+                clc
                 endif
                 clc
 datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
-
+		clc
 datapg1         ds.b dataWidth * dataHeight + 5 + 2; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 3] ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 3 - 1] ; topleft neighbor of the bottomright-most visible cell
+		clc
 datapg1_end     equ . 
