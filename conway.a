@@ -494,12 +494,7 @@ initDataLen     equ .-initData
 dataSeg         equ .
                 seg.u conwayData 
                 org dataSeg
-.clearTopLeft   ldy #y_topleft                  ; cell is off, so clear top left value to remove stale data
-                lda #0
-                sta (altData),y
-                ldy #y_topleft                  ; set top left value to one (previous value is stale)
-                lda #1                          
-                sta (altData),y                 
+              
 datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4 * 0 + 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset + 3 * 11 + 2 * 0 * 1 + 0]     ; topleft neighbor of the bottomright-most visible cell
