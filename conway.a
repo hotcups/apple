@@ -85,7 +85,7 @@ fieldHeight     equ 24
 dataWidth       equ fieldWidth+1
 dataHeight      equ fieldHeight+1
 
-normalText      equ %10000001                   ; 'X | normalText
+normalText      equ %10010001                   ; 'X | normalText
 inverseText     equ %10110110                   ; 'X & inverseText
 
                 if CHARSET == 0
@@ -139,7 +139,7 @@ start           subroutine
                 if TEST_PERF
                 jsr perfTest
                 else
-                bit CLICK
+                bit VTAB
                 bit CLICK
                 jsr runLoop
                 endif
