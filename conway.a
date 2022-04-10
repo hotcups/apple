@@ -560,7 +560,7 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2+5]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 2+5+.y]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
