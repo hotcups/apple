@@ -426,7 +426,6 @@ initScreen      subroutine
 .row            equ .-1
                 bpl .1
                 rts
-		clc
 .bit            ds.b 1
 
 ; inputs:
@@ -445,7 +444,6 @@ getTextRow      subroutine
 rulesTable      dc.b charOn                 
                 dc.b charOn  
                 tax
-                clc
                 dc.b COUT
                 dc.b charOff                    
                 dc.b charOff                    
@@ -470,24 +468,24 @@ initData
                 dc.b %00000000,%10110000,%00110000,%00000000,%00000000
                 dc.b %00000000,%10100000,%00000000,%00000110,%00000000
                 dc.b %11100000,%00000000,%00000000,%00000000,%00000111
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00011100,%00000000,%00111000,%00000000
-                dc.b %00000000,%00010000,%11011011,%00001000,%00000000
-                dc.b %00000000,%00001000,%10011011,%00010000,%00000000
+                dc.b %00000000,%00000000,%00100000,%00000000,%00000000
+                dc.b %00000000,%00000000,%00100000,%00000000,%00000000
+                dc.b %00000000,%00011100,%00100000,%00111000,%00000000
+                dc.b %00000000,%00010000,%11010011,%00001000,%00000000
+                dc.b %00000000,%00001000,%10001011,%00010000,%00000000
                 dc.b %01100000,%00000000,%00000000,%00000000,%00001100
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000001
-                dc.b %00000000,%00001000,%10011011,%00010000,%00000001
-                dc.b %00000000,%00010000,%11011011,%00001000,%00000001
-                dc.b %10000000,%00011100,%00000000,%00111000,%00000000
+                dc.b %00000000,%00001000,%10010011,%00010000,%00000001
+                dc.b %00000000,%00010000,%11001011,%00001000,%00000001
+                dc.b %10000000,%00011100,%00000000,%00101000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%01000000,%00000000,%00000000
                 dc.b %11100000,%00000000,%11000000,%00000000,%00000111
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%01111000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00011000,%11110000,%00000000
-                dc.b %11000000,%00000000,%00100100,%00000000,%00000011
-                dc.b %11000000,%00000000,%00011000,%00001100,%00000011
+                dc.b %00000001,%00000000,%00011000,%11010000,%00000000
+                dc.b %11000001,%00000000,%00100100,%00000000,%00000011
+                dc.b %11000001,%00000000,%00011000,%00001100,%00000011
                 endif
 initDataLen     equ .-initData
 dataSeg         equ .
@@ -496,17 +494,15 @@ dataSeg         equ .
 .clearTopLeft   ldy #y_topleft                  ; cell is off, so clear top left value to remove stale data
                 lda #0
                 sta (altData),y
+                clc
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
-                clc
 datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4 + 0 + 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset + 3/1 + 2 * 0/1 + 0]     ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
-		clc
 datapg1         ds.b dataWidth * dataHeight + 5 + 2 - 0 + 0 + 1; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 3 * 1 / 1] ; topleft neighbor of the bottomright-most visible cell
-		clc
 datapg1_end     equ . 
