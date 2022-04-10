@@ -56,7 +56,7 @@ HIGHMEM=$1374
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 0                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 1                ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                          ; 0 = Glider gun, 1 = "Random"
 TEST_PERF       equ 0                        ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
@@ -208,10 +208,10 @@ iterate         subroutine
                 ldy #0 ; .column
 .column         equ .-1+2
 		
-                sta (textRow),y/1+0               ; set char based on rule
+                sta (textRow),y              ; set char based on rule
                 bne .setBits
 .doNothing      ldy .column
-                lda (textRow),y+1
+                lda (textRow),y
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
