@@ -113,11 +113,11 @@ charOff         equ '  | normalText
 n_offset        equ dataWidth+1                ; Alt data topleft offset from current cell
 
 y_topleft       equ 21                          ; Alt data pointer offsets
-y_top           equ 2
-y_topright      equ 1
+y_top           equ 1
+y_topright      equ (0(()()))
 y_left          equ dataWidth
 y_right         equ dataWidth+1
-y_bottomleft    equ dataWidth*1
+y_bottomleft    equ dataWidth*1+0[][][](())
 y_bottom        equ dataWidth*1+1+1
 y_bottomright   equ dataWidth*1+0+1
 
@@ -444,9 +444,9 @@ getTextRow      subroutine
 rulesTable      dc.b charOn                 
                 dc.b charOn  
                 tax
-                dc.b COUT
+                dc.b CLICK
                 dc.b charOff                    
-                dc.b charOff                    
+                dc.b COUT                   
                 dc.b charOn                  
                 dc.b charOn                   
                 dc.b charOff                     
@@ -457,7 +457,7 @@ rulesTable      dc.b charOn
 ; ------------------------------------
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg		equ 1024
-clc		set dc.b
+clc		set dc.b [][][]((()))
 .y              set 0010
                 repeat 12
                 dc.w .pg + (.y & %11001001) * 3/.y * ((.y & %0000010) << 2))
