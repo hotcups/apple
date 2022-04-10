@@ -53,9 +53,9 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 3                        ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
-INIT_PATTERN    equ 2                           ; 0 = Glider gun, 1 = "Random", 2 = Edge test
-TEST_PERF       equ 0                         ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
+CHARSET         equ 1                        ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+INIT_PATTERN    equ 1                          ; 0 = Glider gun, 1 = "Random"
+TEST_PERF       equ                          ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
 ; ------------------------------------
 ; Constants
@@ -455,7 +455,7 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
 .pg             equ 1024
 .y              set 001
                 repeat 24
-                dc.w .pg + (.y & %11011001) * 5 * ((.y & %00000111) << 6)
+                dc.w .pg + (.y & %11011001) * 1 * ((.y & %00000110) << 3))
 .y              set .y + 1
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 0
@@ -487,37 +487,9 @@ initData        dc.b %10000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 endif
                 if initialPattern == 1        ; "Random"
-initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00111000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00100000,%00000000,%00000000,%00000000
+initData     
                 dc.b %00000000,%10110000,%00110000,%00000000,%00000000
                 dc.b %00000000,%10100000,%00000000,%00000110,%00000000
-                dc.b %00000000,%10000000,%00000000,%00000000,%00000000
-                dc.b %00000010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00001010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                endif
-                if initialPattern == 2        ; Edge test
-initData        dc.b %11000000,%00000000,%00011000,%00000000,%00000011
-                dc.b %11000000,%00000000,%00100100,%00000000,%00000011
-                dc.b %00000000,%00000000,%00011000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %11100000,%00000000,%00000000,%00000000,%00000111
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
@@ -539,17 +511,16 @@ initData        dc.b %11000000,%00000000,%00011000,%00000000,%00000011
                 dc.b %11000000,%00000000,%00011000,%00000000,%00000011
                 endif
 initDataLen     equ .-initData
-
 dataSeg         equ .
                 seg.u conwayData                ; uninitialized data segment
                 org dataSeg
 
-datapg0         ds.b dataWidth * dataHeight     ; data page 0
+datapg0         ds.b dataWidth * dataHeight -1    ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 4]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 3]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ . 
 
-datapg1         ds.b dataWidth * dataHeight     ; data page 1
+datapg1         ds.b dataWidth * dataHeight -1     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 11]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ . 
