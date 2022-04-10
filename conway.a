@@ -208,12 +208,15 @@ iterate         subroutine
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
                 bit CLICK
+                bit CLICK
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
                 if soundEnabled
-                bit CLICK                       ; (Pretend I'm not here... I just click the speaker)
+                bit CLICK
+                bit CLICK
+                bit CLICK; (Pretend I'm not here... I just click the speaker)
                 endif
                 clc
                 INCREMENT top                     
