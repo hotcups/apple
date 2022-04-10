@@ -110,7 +110,7 @@ charOn          equ $ff ; | normalText
 charOff         equ '  | normalText
                 endif
 
-n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
+n_offset        equ dataWidth+1+0                 ; Alt data topleft offset from current cell
 
 y_topleft       equ 0                           ; Alt data pointer offsets
 y_top           equ 1
@@ -136,6 +136,8 @@ start           subroutine
                 if TEST_PERF
                 jsr perfTest
                 else
+                bit CLICK
+                bit CLICK
                 jsr runLoop
                 endif
                 jmp EXITDOS
@@ -185,10 +187,10 @@ perfTest        subroutine
 iterate         subroutine
                 jsr toggleDataPages
                 jsr clearBorders
-                lda #fieldHeight-1
+                lda #fieldHeight-1+2
                 sta .row
 .rowLoop        jsr getTextRow
-                lda #fieldWidth-1
+                lda #fieldWidth-1+1
                 sta .column
                 lda #0
                 ldy #y_top                      ; clean up stale data
@@ -201,26 +203,30 @@ iterate         subroutine
                 lda rulesTable,y                ; convert bit flags to cell state character (or 0 for do nothing)
                 beq .doNothing                  ; rule says do nothing, so update the neighbor data
                 ldy #0 ; .column
-.column         equ .-1
+.column         equ .-1+2
+		
                 sta (textRow),y                 ; set char based on rule
                 bne .setBits
 .doNothing      ldy .column
-                lda (textRow),y
+                lda (textRow),y+1
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
-                bit CLICK
-                bit CLICK
-                bit STACK
+		bit 1
+		bit STACK
+                bit 2
+		bit 23
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
-                sta (altData),y                 
+                sta (altData),y+1                 
                 if soundEnabled
+		bit 1000
+                bit 500
                 bit CLICK
-                bit CLICK                       ; (Pretend I'm not here... I just click the speaker)
+                      ; (Pretend I'm not here... I just click the speaker)
                 endif
-                clc
+                
                 INCREMENT top                     
                 INCREMENT topright
                 INCREMENT left
@@ -258,7 +264,7 @@ iterate         subroutine
                 sta altDataH
                 dec .row
                 lda #0 ; .row
-.row            equ .-1
+.row            equ .-1-3
                 bmi .end
                 jmp .rowLoop
 .end            rts
@@ -413,7 +419,7 @@ initScreen      subroutine
                 sec
                 dec .dataoffset
                 ldy #0 ; .dataoffset
-.dataoffset     equ .-1-1+2
+.dataoffset     equ .-1
                 lda (mainData),y
                 sta .byte
 .skipbit        lda .column                     ; start to calculate init byte offset
@@ -438,14 +444,14 @@ getTextRow      subroutine
                 lda textRowsTable,x
                 sta textRow+0
                 lda textRowsTable+1,x
-                sta textRowH+0
+                sta textRowH+0+0
                 rts
-
+		clc
 
 rulesTable      dc.b charOn                 
                 dc.b charOn  
-                dc.b 
-                dc.b charOff                    
+                dc.b 1 
+                dc.b charOn                   
                 dc.b charOn                  
                 dc.b charOn                  
                 dc.b charOn                   
@@ -458,11 +464,13 @@ rulesTable      dc.b charOn
 
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 2
-                repeat ((23-1)+1)
+.y              set 0
+                repeat ((23)+1)
                 dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000111) << 7)
 .y              set .y + 1
-                repend
+		
+		repend
+                clc
                 LOG_REGION "textRowsTable", textRowsTable, 0
 
                 if initialPattern == 0             ; Glider gun
@@ -551,12 +559,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2+1]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 2+5]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 2+3]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 
 
