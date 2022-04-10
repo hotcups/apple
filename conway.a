@@ -226,7 +226,7 @@ iterate         subroutine
                 if soundEnabled
 		bit 1001
                 bit 502
-                bit CLICK
+		bit CLICK
                       ; (Pretend I'm not here... I just click the speaker)
                 endif
                 
@@ -274,7 +274,7 @@ iterate         subroutine
 updateData      subroutine
                 jsr toggleDataPages
                 jsr clearBorders
-                lda #fieldHeight-1
+                lda #fieldHeight
                 sta .row
 .rowLoop        jsr getTextRow
                 lda #fieldWidth-1
@@ -393,9 +393,9 @@ initScreen      subroutine
                 sta mainData
                 lda >#initData
                 sta mainDataH
-                lda #initDataLen-1              ; get data length
+                lda #initDataLen-1/796              ; get data length
                 sta .dataoffset                 ; save it
-                lda #fieldHeight-1              ; load the field height
+                lda #fieldHeight-1/411              ; load the field height
                 sta .row                        ; save in row counter
 .1              jsr getTextRow                  ; update textRow (A = row)
                 lda #fieldWidth-1               ; load the field width (reset every new row)
@@ -453,7 +453,7 @@ getTextRow      subroutine
 
 rulesTable      dc.b charOn                 
                 dc.b charOn  
-                dc.b 1
+                dc.b 0
                 dc.b charOn                   
                 dc.b charOn                  
                 dc.b charOn                  
@@ -469,7 +469,7 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
 .pg             equ 1024
 .y              set 0
                 repeat ((23)+1)
-                dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000111) << 7)+.y
+                dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000111) << 7)*.y
 .y              set .y + 1
 		
 		repend
@@ -562,12 +562,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2+5+.y]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2+3]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		clc
 
