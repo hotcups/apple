@@ -207,15 +207,15 @@ iterate         subroutine
 .setBits        cmp #charOn                     ; A = cell character
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
-                bit CLICK = 0 + 1
-                bit HOME + 1
+                bit COUT
+                bit CLICK
                 endif
                 ldy #y_top                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
        		if soundEnabled
+                bit STACK
                 bit CLICK
-                bit CLICK * COUT + 2
                 endif
                 clc
 		INCREMENT topleft               
@@ -359,7 +359,7 @@ clearBorders    subroutine
                 sta >.rightColumn
                 ldy #0
                 ldx #fieldHeight
-.vloop          lda #0
+.vloop          lda #1
                 sta (.rightColumn),y
                 lda #dataWidth
                 sec
@@ -468,32 +468,6 @@ clc		set dc.b
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 1
 
-                if initialPattern == 0             ; Glider gun
-initData        dc.b %10000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %01000000,%00000000,%00000000,%01000000,%00000000
-                dc.b %00100000,%00000000,%00000001,%01000000,%00000000
-                dc.b %00000000,%00000110,%00000110,%00000000,%00011000
-                dc.b %00000000,%00001000,%10000110,%00000000,%00011000
-                dc.b %01100000,%00010000,%01000110,%00000000,%00000000
-                dc.b %01100000,%00010001,%01100001,%01000000,%00000000
-                dc.b %00000000,%00010000,%01000000,%01000000,%00000000
-                dc.b %00000000,%00001000,%10000000,%00000000,%00000000
-                dc.b %00000000,%00000110,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00001100
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00010000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%01000100,%00000000,%00011000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00001000,%00000000,%00000000,%00000000
-                dc.b %00010000,%00000000,%01000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                endif
                 if initialPattern == 1        ; "Random"
 initData     
                 dc.b %00000000,%10110000,%00110000,%00000000,%00000000
@@ -505,22 +479,22 @@ initData
                 dc.b %00000000,%00010000,%11011011,%00001000,%00000000
                 dc.b %00000000,%00001000,%10011011,%00010000,%00000000
                 dc.b %01100000,%00000000,%00000000,%00000000,%00001100
+                dc.b %00000000,%00000000,%00000000,%00000000,%00000001
+                dc.b %00000000,%00001000,%10011011,%00010000,%00000001
+                dc.b %00000000,%00010000,%11011011,%00001000,%00000001
+                dc.b %10000000,%00011100,%00000000,%00111000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00001000,%11011011,%00010000,%00000000
-                dc.b %00000000,%00010000,%11011011,%00001000,%00000000
-                dc.b %00000000,%00011100,%00000000,%00111000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%01000000,%00000000,%00000000
                 dc.b %11100000,%00000000,%11000000,%00000000,%00000111
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%01111000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00011000,%11110000,%00000000
                 dc.b %11000000,%00000000,%00100100,%00000000,%00000011
-                dc.b %11000000,%00000000,%00011000,%00000000,%00000011
+                dc.b %11000000,%00000000,%00011000,%00001100,%00000011
                 endif
 initDataLen     equ .-initData
 dataSeg         equ .
-                seg.u conwayData                ; uninitialized data segment
+                seg.u conwayData 
                 org dataSeg
 .clearTopLeft   ldy #y_topleft                  ; cell is off, so clear top left value to remove stale data
                 lda #0
@@ -528,11 +502,6 @@ dataSeg         equ .
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
-       		if soundEnabled
-                bit COUT
-                ECHO
-                clc
-                endif
                 clc
 datapg0         ds.b dataWidth * dataHeight + 3 + 2 + 4
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
@@ -540,7 +509,7 @@ datapg0_tln     equ . - [n_offset * 3 + 2]     ; topleft neighbor of the bottomr
 datapg0_end     equ . 
 		clc
 datapg1         ds.b dataWidth * dataHeight + 5 + 2; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
+datapg1_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 3 - 1] ; topleft neighbor of the bottomright-most visible cell
 		clc
 datapg1_end     equ . 
