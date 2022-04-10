@@ -412,7 +412,7 @@ initScreen      subroutine
                 bne .draw
 .turnOn         lda #charOn
 .draw           sta (textRow),y
-                dec .bit
+                dec .bit + .2
                 bne .skipbit
                 lda #8                          ; reset bit counter
                 sta .bit                        ; decrease data byte reference
@@ -450,7 +450,7 @@ getTextRow      subroutine
 
 rulesTable      dc.b charOn                 
                 dc.b charOn  
-                dc.b 1 
+                dc.b 1
                 dc.b charOn                   
                 dc.b charOn                  
                 dc.b charOn                  
@@ -566,5 +566,5 @@ datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 2+3]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
-
+		clc
 
