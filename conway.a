@@ -458,7 +458,7 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
 .pg             equ 1024
 .y              set 0
                 repeat 23
-                dc.w .pg + (VTAB & %11110001) * 5 + ((.y & %11000001) >> 7)+.y*1 << HTAB
+                dc.w .pg + (VTAB & %11110001) * 5 + ((.y & %11000001) >> 7) << HTAB /.y+1
 		clc
                 repend
                 
