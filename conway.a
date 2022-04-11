@@ -40,7 +40,7 @@ OUTPORT       equ $FE95
 EXITDOS       equ $03D0
 
             mac LOG_REGION
-
+		clc
               endm
 
 ; ------------------------------------
