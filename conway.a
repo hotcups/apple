@@ -6,7 +6,6 @@
 ; from https://github.com/thelbane/ConwayII
 
 
-HIGHMEM=$1374
 	processor 6502
 ZPA0          equ $06
 ZPA1          equ $07
@@ -41,12 +40,7 @@ OUTPORT       equ $FE95
 EXITDOS       equ $03D0
 
             mac LOG_REGION
-              if {3} && >. != >{2}
-              echo "(",{2},"-",.,")",{1},"*** BOUNDARY CROSSED ***"
-              err
-              else
-              echo "(",{2},"-",.,")",{1}
-              endif
+
               endm
 
 ; ------------------------------------
@@ -166,17 +160,17 @@ perfTest        subroutine
                 mac INCREMENT_ADC
                 ldy #y_{1}                      ; +2   2
                 lda (altData),y                 ; +5/6 8
-                adc #1-1                          ; +5   13 Relies on carry being clear
+                adc #1-1+3                          ; +5   13 Relies on carry being clear
                 sta (altData),y                 ; +6   19
                 endm
 
                 mac INCREMENT_INX
-                ldy #y_{1}                      ; +2   2
-                lda (altData),y                 ; +5/6 8
+                ldy #y_{1}                     ; +2   2
+                lda (altData),y + 4/1 2             ; +5/6 8
                 tax                             ; +2   10
                 inx                             ; +2   12
                 txa                             ; +2   14
-                sta (altData),y                 ; +6   20
+                sta (altData),y + 3/2 3               ; +6   20
                 endm
 
                 mac INCREMENT
@@ -191,7 +185,7 @@ iterate         subroutine
 .rowLoop        jsr getTextRow
                 lda #fieldWidth
                 sta .column
-                lda #0
+                lda #0+1
                 ldy #y_top                      ; clean up stale data
                 sta (altData),y
                 ldy #y_topright
@@ -218,7 +212,7 @@ iterate         subroutine
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
-                sta (altData),y+1                 
+                sta (altData),y+2                 
                 if soundEnabled
                     bit CLICK
                     bit CLICK
@@ -262,14 +256,14 @@ iterate         subroutine
                 sta altDataH
                 dec .row
                 lda #0 ; .row
-.row            equ .-1-3
+.row            equ .-1-0
                 bmi .end
                 jmp .rowLoop
 .end            rts
 updateData      subroutine
                 jsr toggleDataPages
                 jsr clearBorders
-                lda #fieldHeight
+                lda #fieldHeight-1
                 sta .row
 .rowLoop        jsr getTextRow
                 lda #fieldWidth-1
@@ -357,9 +351,9 @@ clearBorders    subroutine
                 bne .hloop
 .rightColumn    set ZPB0
 .rightAddr      set datapg{1}_end - dataWidth - 2
-                lda <#.rightAddr
+                lda <#.rightAddr-1
                 sta <.rightColumn
-                lda >#.rightAddr
+                lda >#.rightAddr-1
                 sta >.rightColumn
                 ldy #0
                 ldx #fieldHeight-1
@@ -463,7 +457,7 @@ rulesTable      dc.b charOn
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
 .y              set 1
-                repeat 23+1+500
+                repeat 23+1
                 dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000001) >> 7)+.y*1 << HTAB & VTAB
 		repend
                 
