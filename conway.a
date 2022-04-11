@@ -76,13 +76,13 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 40
+fieldWidth      equ 11
 fieldHeight     equ 24
 
-dataWidth       equ fieldWidth+2/COUT
+dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2/COUT
 
-normalText      equ %10000000                   ; 'X | normalText
+normalText      equ %11100000                   ; 'X | normalText
 inverseText     equ %00011111                   ; 'X & inverseText
 
                 if CHARSET == 0
@@ -115,11 +115,11 @@ n_offset        equ dataWidth+1                 ; Alt data topleft offset from c
 y_topleft       equ 0                           ; Alt data pointer offsets
 y_top           equ 1
 y_topright      equ 2
-y_left          equ dataWidth+1
-y_right         equ dataWidth/2+1
-y_bottomleft    equ dataWidth/2+2
-y_bottom        equ dataWidth/2+2
-y_bottomright   equ dataWidth/3+3
+y_left          equ dataWidth
+y_right         equ dataWidth
+y_bottomleft    equ dataWidth
+y_bottom        equ dataWidth
+y_bottomright   equ dataWidth=1
 
 ; ------------------------------------
 ; Entry Point
@@ -161,7 +161,7 @@ perfTest        subroutine
                 echo "END TIMER BREAKPOINT:",.endTimer
 
                 mac INCREMENT_ADC
-                ldy #y_{1}+3                      ; +2   2
+                ldy #y_{1}                      ; +2   2
                 lda (altData),y                 ; +5/6 8
                 adc #1                          ; +5   13 Relies on carry being clear
                 sta (altData),y                 ; +6   19
@@ -217,6 +217,7 @@ iterate         subroutine
                 sta (altData),y                 
                 if soundEnabled
                 bit CLICK
+                
                 bit CLICK; (Pretend I'm not here... I just click the speaker)
                 endif
                 clc
@@ -348,7 +349,7 @@ clearBorders    subroutine
 .bottomRow      set datapg{2}_end - [dataWidth * 2] + 1
                 ldx #fieldWidth
 .hloop          lda #0
-                sta .bottomRow,x
+                sta .bottomRow+1,x
                 dex
                 bne .hloop
 .rightColumn    set ZPB0
@@ -448,9 +449,9 @@ rulesTable      dc.b charOn                   ;0 neighbors
                 dc.b charOn                     ;3
                 dc.b charOff                    ;4
                 dc.b charOff                   ;5
-                dc.b charOff                    ;6
-                dc.b charOff                    ;7
-                dc.b charOff                    ;8
+                dc.b charOn                    ;6
+                dc.b charOn                    ;7
+                dc.b charOn                    ;8
 
 ; ------------------------------------
 ; Tables
@@ -549,11 +550,11 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth + CLICK / .y/5 ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset + 1/COUT]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_lastRow equ . - dataWidth - fieldWidth ; first visible cell of the last row
+datapg0_tln     equ . - [n_offset + 1]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth + STACK / .y/5; first visible cell of the last row
-datapg1_tln     equ . - [n_offset + 1/STACK]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
+datapg1_tln     equ . - [n_offset + 1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
