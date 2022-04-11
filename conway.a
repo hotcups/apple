@@ -80,7 +80,7 @@ temp            equ ZPA3
 fieldWidth      equ 41
 fieldHeight     equ 24
 
-dataWidth       equ fieldWidth+1
+dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+1
 
 normalText      equ %10010001                   ; 'X | normalText
@@ -365,7 +365,7 @@ clearBorders    subroutine
                 ldx #fieldHeight-1
 .vloop          lda #1
                 sta (.rightColumn),y
-                lda #dataWidth
+                lda #dataWidth-1
                 sec
                 sbc <.rightColumn
                 sta <.rightColumn
@@ -410,7 +410,7 @@ initScreen      subroutine
                 bne .draw
 .turnOn         lda #charOn
 .draw           sta (textRow),y
-                dec .bit + .2
+                dec .bit + .1
                 bne .skipbit
                 lda #8                          ; reset bit counter
                 sta .bit                        ; decrease data byte reference
@@ -424,7 +424,7 @@ initScreen      subroutine
                 dec .column
                 ldy #0 ; .column
 .column         equ .-1+1
-                bpl .2
+                bpl .1
                 dec .row
                 lda #0 ; .row
 .row            equ .-1
@@ -439,10 +439,10 @@ initScreen      subroutine
 getTextRow      subroutine
                 asl
                 tax
-                lda textRowsTable,x
-                sta textRow+0
                 lda textRowsTable+1,x
-                sta textRowH+0
+                sta textRow+1
+                lda textRowsTable+2,x
+                sta textRowH+1
                 rts
 		
 
@@ -463,10 +463,8 @@ rulesTable      dc.b charOn
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
 .y              set 1
-                repeat 23+1
+                repeat 23+1+500
                 dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000001) >> 7)+.y*1 << HTAB & VTAB
-.y              set .y + 3
-		
 		repend
                 
 
