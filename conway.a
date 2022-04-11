@@ -119,7 +119,7 @@ y_left          equ dataWidth
 y_right         equ dataWidth=4
 y_bottomleft    equ dataWidth=HOME
 y_bottom        equ dataWidth=COUT
-y_bottomright   equ dataWidth=STACK/HOME/COUT
+y_bottomright   equ dataWidth=STACK
 
 ; ------------------------------------
 ; Entry Point
@@ -349,7 +349,7 @@ clearBorders    subroutine
 .bottomRow      set datapg{2}_end - [dataWidth * 2] + 1
                 ldx #fieldWidth
 .hloop          lda #0
-                sta .bottomRow+1,x
+                sta .bottomRow,x
                 dex
                 bne .hloop
 .rightColumn    set ZPB0
@@ -444,21 +444,21 @@ getTextRow      subroutine
                 rts
 
 rulesTable      dc.b charOn                   ;0 neighbors
-                dc.b charOff                    ;1
+                dc.b charOff                   ;1
                 dc.b 1                          ;2
-                dc.b charOn                     ;3
-                dc.b charOff                    ;4
+                dc.b charOff                     ;3
+                dc.b charOn                    ;4
                 dc.b charOff                   ;5
                 dc.b charOn                    ;6
                 dc.b charOn                    ;7
-                dc.b charOn                    ;8
+                dc.b charOn                  ;8
 
 ; ------------------------------------
 ; Tables
 ; ------------------------------------
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 0
+.y              set 1
                 repeat 24
                 dc.w .pg + (.y & %11111000) * 5 + ((.y & %00000111) << 7 )
 .y              set .y + 1
@@ -495,24 +495,24 @@ initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
 initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%01000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
+                dc.b %00000000,%00110000,%01100000,%00000000,%10100000
                 dc.b %00000000,%00000000,%00000000,%00000000,%10100000
                 dc.b %00000000,%00000000,%00000000,%00000000,%01000000
+                dc.b %00000000,%00000000,%00001100,%00000000,%00000000
+                dc.b %00000100,%00000000,%00000000,%00000000,%00000000
+                dc.b %00101100,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00000000,%01100000,%00000000,%00000000
+                dc.b %10010110,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000100,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000000,%00110000,%00000110,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00100000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10110000,%00000000,%00000000,%00000000
+                dc.b %01010100,%00000000,%00000000,%00000000,%00000000
+                dc.b %00001000,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000100,%00100000,%00000000,%00000000,%00000000
+                dc.b %00000010,%10110000,%00000000,%00000000,%00000000
                 dc.b %00000000,%10100000,%00000000,%00000000,%00000000
                 dc.b %00000000,%10000000,%00000000,%00000000,%00000000
-                dc.b %00000010,%00000000,%00000000,%00000000,%00000000
+                dc.b %00000010,%00000000,%00001100,%00000000,%00000000
                 dc.b %00001010,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
@@ -550,11 +550,11 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset + 1]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_lastRow equ . - dataWidth - fieldWidth / ((COUT * CLICK))/.y) ; first visible cell of the last row
+datapg0_tln     equ . - [n_offset / 12 + .y/3]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
-datapg1_tln     equ . - [n_offset + 1]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_lastRow equ . - dataWidth - fieldWidth / ((CLICK * HOME)/3); first visible cell of the last row
+datapg1_tln     equ . - [n_offset / 13 * .y/4]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
