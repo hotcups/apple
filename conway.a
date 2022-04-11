@@ -463,12 +463,12 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
                 
 
                 if initialPattern == 1        ; "Random"
-initData        dc.b %00000000,%00000100,%01000000,%00000000,%00000000
+initData        dc.b %11000100,%00000100,%01000000,%00000000,%00000000
                 dc.b %00000000,%00001000,%00100000,%00000000,%00000000
                 dc.b %00000000,%00010000,%00011000,%00000000,%01000000
                 dc.b %00000000,%00100000,%00000100,%00000000,%10100000
                 dc.b %00000000,%00100000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
+                dc.b %00100100,%01000010,%00000000,%01100000,%01000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00001100,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000100,%00000000
@@ -478,7 +478,7 @@ initData        dc.b %00000000,%00000100,%01000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00011000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
+                dc.b %00000000,%00000000,%10001011,%01110000,%01000000
                 dc.b %00000000,%00100000,%00000000,%00000000,%00000000
                 dc.b %00000000,%10110000,%00000000,%00000000,%00000000
                 dc.b %00000000,%10100000,%00000000,%00000000,%00000000
@@ -496,12 +496,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 3]/.y          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * .y-1]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2]*.y          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset .y]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		
 
