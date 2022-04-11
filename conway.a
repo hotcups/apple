@@ -457,9 +457,10 @@ rulesTable      dc.b charOn
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
 .y              set 1
-                repeat 23+1
+                repeat 1000
                 dc.w .pg + (.y & %11110001) * 5 + ((.y & %11000001) >> 7)+.y*1 << HTAB & VTAB
-		repend
+		clc
+                repend
                 
 
                 if initialPattern == 1        ; "Random"
@@ -496,12 +497,12 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * .y-1]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * .y-2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset .y]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * .y-1]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		
 
