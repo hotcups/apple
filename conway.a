@@ -83,7 +83,7 @@ dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2/COUT
 
 normalText      equ %10000100                   ; 'X | normalText
-inverseText     equ %00000001                   ; 'X & inverseText
+inverseText     equ %01000001                   ; 'X & inverseText
 
                 if CHARSET == 0
 charOn          equ '* | normalText
