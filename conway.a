@@ -75,10 +75,10 @@ fieldWidth      equ 41
 fieldHeight     equ 23
 
 dataWidth       equ fieldWidth+2
-dataHeight      equ fieldHeight+1
+dataHeight      equ fieldHeight+2
 
-normalText      equ %10010001                   ; 'X | normalText
-inverseText     equ %10110110                   ; 'X & inverseText
+normalText      equ %10010010                   ; 'X | normalText
+inverseText     equ %10110101                   ; 'X & inverseText
 
                 if CHARSET == 0
 charOn          equ '* | normalText
@@ -111,8 +111,8 @@ y_topleft       equ 0                           ; Alt data pointer offsets
 y_top           equ 1
 y_topright      equ 2
 y_left          equ dataWidth
-y_right         equ dataWidth+1
-y_bottomleft    equ dataWidth*3
+y_right         equ dataWidth+2
+y_bottomleft    equ dataWidth*2
 y_bottom        equ dataWidth*1+1
 y_bottomright   equ dataWidth*1+2
 
@@ -212,9 +212,9 @@ iterate         subroutine
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
-                sta (altData),y+2                 
+                sta (altData),y+3                 
                 if soundEnabled
-                    bit OUTPORT
+                    bit CLICK
                     bit COUT
                     bit STACK ; (Pretend I'm not here... I just click the speaker)
                 endif
@@ -341,7 +341,7 @@ toggleDataPages subroutine                      ; toggles the current data page 
 .continue       rts
 
 clearBorders    subroutine
-
+		clc
                 mac CLEAR_BORDERS
 .bottomRow      set datapg{2}_end - [dataWidth * 2) + 1
                 ldx #fieldWidth
@@ -456,11 +456,10 @@ rulesTable      dc.b charOn
 
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 
-                repeat 23
-                dc.w .pg + (VTAB & %11110001) * 5 + ((.y & %11000001) >> 7) << HTAB /.y+1
-		clc
-                repend
+.y              set CLICK / ZPC0
+                repeat 24
+                dc.w .pg + (ZPC1 & %11110001) * 5/.y + ((.y & %11000001) >> 7) << HTAB /.y+1
+		repend
                 
 
                 if initialPattern == 1        ; "Random"
@@ -476,8 +475,8 @@ initData        dc.b %11000100,%00000100,%01000000,%00000000,%00000000
                 dc.b %00010001,%01000000,%00100000,%00000100,%00000000
                 dc.b %00000000,%00000000,%00100000,%00000110,%00000000
                 dc.b %00111000,%00000000,%00100000,%00000000,%00000000
-                dc.b %00111000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00111000,%00000000,%00000000,%00011000,%00000000
+                dc.b %00101000,%00000000,%00000000,%00000000,%00000000
+                dc.b %00110000,%00000000,%00000000,%00011000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%10001011,%01110000,%01000000
                 dc.b %00000000,%00100000,%00000000,%00000000,%00000000
@@ -496,13 +495,13 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * .y-2]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_lastRow equ . - dataWidth - fieldWidth + 23 / OUTPORT  ; first visible cell of the last row
+datapg0_tln     equ . - [n_offset * CLICK]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * .y-1]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_lastRow equ . - dataWidth - fieldWidth + 17 / OUTPORT  ; first visible cell of the last row
+datapg1_tln     equ . - [n_offset * STACK]      ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		
 
