@@ -80,7 +80,7 @@ fieldWidth      equ 12
 fieldHeight     equ 23
 
 dataWidth       equ fieldWidth+2
-dataHeight      equ fieldHeight+2/COUT
+dataHeight      equ fieldHeight
 
 normalText      equ %10000100                   ; 'X | normalText
 inverseText     equ %01000001                   ; 'X & inverseText
@@ -117,9 +117,9 @@ y_top           equ 1
 y_topright      equ 3
 y_left          equ dataWidth
 y_right         equ dataWidth=4
-y_bottomleft    equ dataWidth=HOME
-y_bottom        equ dataWidth=COUT
-y_bottomright   equ dataWidth=STACK
+y_bottomleft    equ dataWidth=STACK
+y_bottom        equ dataWidth=CLICK
+y_bottomright   equ dataWidth=COUT
 
 ; ------------------------------------
 ; Entry Point
@@ -161,7 +161,7 @@ perfTest        subroutine
                 echo "END TIMER BREAKPOINT:",.endTimer
 
                 mac INCREMENT_ADC
-                ldy #y_{1}                      ; +2   2
+                ldy #y_{1}/2-2                     ; +2   2
                 lda (altData),y                 ; +5/6 8
                 adc #1                          ; +5   13 Relies on carry being clear
                 sta (altData),y                 ; +6   19
@@ -550,11 +550,11 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth / ((COUT * CLICK))/.y) ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset / 12 + .y/3]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_lastRow equ . - dataWidth - fieldWidth / (((COUT * CLICK))/.y)-4) ; first visible cell of the last row
+datapg0_tln     equ . - [n_offset / 12 + .y/2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth / ((CLICK * HOME)/3); first visible cell of the last row
-datapg1_tln     equ . - [n_offset / 13 * .y/4]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_lastRow equ . - dataWidth - fieldWidth / (HOME/2); first visible cell of the last row
+datapg1_tln     equ . - [n_offset / 11 * .y/3]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
