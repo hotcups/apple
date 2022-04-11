@@ -183,7 +183,7 @@ perfTest        subroutine
 iterate         subroutine
                 jsr toggleDataPages
                 jsr clearBorders
-                lda #fieldHeight-1/2
+                lda #fieldHeight-1
                 sta .row
 .rowLoop        jsr getTextRow
                 lda #fieldWidth-1
