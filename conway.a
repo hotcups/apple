@@ -53,7 +53,7 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 2                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 0                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                           ; 0 = Glider gun, 1 = "Random", 2 = Edge test
 TEST_PERF       equ 0                           ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
@@ -76,8 +76,8 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 11
-fieldHeight     equ 24
+fieldWidth      equ 12
+fieldHeight     equ 23
 
 dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2/COUT
