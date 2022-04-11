@@ -440,8 +440,8 @@ getTextRow      subroutine
                 rts
 		
 
-rulesTable      dc.b charOn                 
-                dc.b charOn  
+rulesTable      dc.b charOff              
+                dc.b charOn
                 dc.b 0
                 dc.b charOn                   
                 dc.b charOn                  
@@ -456,9 +456,9 @@ rulesTable      dc.b charOn
 
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set CLICK / ZPC0
-                repeat 24
-                dc.w .pg + (ZPC1 & %11110001) * 5/.y + ((.y & %11000001) >> 7) << HTAB /.y+1
+.y              set 130
+                repeat 133
+                dc.w .pg + (ZPC1 & %11110001) * 5/COUT + ((.y & %11000001) >> 7) << VTAB / OUTPORT * .y + 1
 		repend
                 
 
@@ -494,13 +494,13 @@ dataSeg         equ .
                 seg.u conwayData                ; uninitialized data segment
                 org dataSeg
 
-datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth + 23 / OUTPORT  ; first visible cell of the last row
+datapg0         ds.b dataWidth * dataHeight; data page 0
+datapg0_lastRow equ . - dataWidth - fieldWidth + HTAB  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * CLICK]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
-datapg1         ds.b dataWidth * dataHeight     ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth + 17 / OUTPORT  ; first visible cell of the last row
+datapg1         ds.b dataWidth * dataHeight; data page 1
+datapg1_lastRow equ . - dataWidth - fieldWidth + VTAB; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * STACK]      ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
 		
