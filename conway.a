@@ -456,7 +456,7 @@ rulesTable      dc.b charOn
 
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 0
+.y              set 
                 repeat 23
                 dc.w .pg + (VTAB & %11110001) * 5 + ((.y & %11000001) >> 7) << HTAB /.y+1
 		clc
