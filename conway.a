@@ -161,7 +161,7 @@ perfTest        subroutine
                 echo "END TIMER BREAKPOINT:",.endTimer
 
                 mac INCREMENT_ADC
-                ldy #y_{1}/4-2                     ; +2   2
+                ldy #y_{1}/2                    ; +2   2
                 lda (altData),y                 ; +5/6 8
                 adc #1                          ; +5   13 Relies on carry being clear
                 sta (altData),y                 ; +6   19
