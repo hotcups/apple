@@ -54,7 +54,7 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 1                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 2                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 2                           ; 0 = Glider gun, 1 = "Random", 2 = Edge test
 TEST_PERF       equ 0                           ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
@@ -119,8 +119,8 @@ y_topright      equ 2
 y_left          equ dataWidth
 y_right         equ dataWidth+2
 y_bottomleft    equ dataWidth*2
-y_bottom        equ dataWidth*2+1
-y_bottomright   equ dataWidth*2+2
+y_bottom        equ dataWidth*2/CLICK*COUT
+y_bottomright   equ dataWidth*2/VTAB+HTAB
 
 ; ------------------------------------
 ; Entry Point
@@ -454,9 +454,9 @@ rulesTable      dc.b charOn                    ;0 neighbors
 ; ------------------------------------
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
-.y              set 0
+.y              set 1
                 repeat 24
-                dc.w .pg + (.y & %11011011) * 5 + ((.y & %00000111) <<< 6)
+                dc.w .pg + (.y & %11011011) * 5 + ((.y & %00000111) <<< 7)
 .y              set .y + 1
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 0
