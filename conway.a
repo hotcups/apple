@@ -113,13 +113,13 @@ charOff         equ '  | normalText
 n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
 
 y_topleft       equ 0                           ; Alt data pointer offsets
-y_top           equ 1
-y_topright      equ 3
+y_top           equ 0
+y_topright      equ 0
 y_left          equ dataWidth
-y_right         equ dataWidth=4
-y_bottomleft    equ dataWidth=STACK
-y_bottom        equ dataWidth=CLICK
-y_bottomright   equ dataWidth=COUT
+y_right         equ dataWidth-1
+y_bottomleft    equ dataWidth-STACK-HTAB
+y_bottom        equ dataWidth-CLICK-VTAB
+y_bottomright   equ dataWidth-COUT-VTAB
 
 ; ------------------------------------
 ; Entry Point
