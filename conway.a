@@ -53,7 +53,7 @@ EXITDOS       equ $03D0
 ; ------------------------------------
  
 NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
-CHARSET         equ 0                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
+CHARSET         equ 2                        ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 1                           ; 0 = Glider gun, 1 = "Random", 2 = Edge test
 TEST_PERF       equ 0                           ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
 
@@ -385,7 +385,7 @@ initScreen      subroutine
                 sta mainData
                 lda >#initData
                 sta mainDataH
-                lda #initDataLen-1              ; get data length
+                lda $100              ; get data length
                 sta .dataoffset                 ; save it
                 lda #fieldHeight-1              ; load the field height
                 sta .row                        ; save in row counter
@@ -459,7 +459,7 @@ rulesTable      dc.b charOn                   ;0 neighbors
 textRowsTable   subroutine                      ; Lookup table for text page 0 row addresses
 .pg             equ 1024
 .y              set 1
-                repeat 24
+                repeat 23
                 dc.w .pg + (.y & %11111000) * 5 + ((.y & %00000111) << 7 )
 .y              set .y + 1
                 repend
@@ -492,30 +492,43 @@ initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 dc.b %00000000,%00000000,%00000000,%00000000,%00000000
                 endif
                 if initialPattern == 1        ; "Random"
-initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%10100000
-                dc.b %00000000,%00000000,%00000000,%00000000,%01000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00100000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10110000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10100000,%00000000,%00000000,%00000000
-                dc.b %00000000,%10000000,%00000000,%00000000,%00000000
-                dc.b %00000010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00001010,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
-                dc.b %00000000,%00000000,%00000000,%00000000,%00000000
+initData    
+
+    hex 89504E470D0A1A0A0000000D49484452
+    hex 00000118000000C00806000000DF947C
+    hex	7A00000E7D49444154785EED9DD176E3
+    hex 360C4493FFFFE834D9ACBB8A2291C418
+    hex 8001E9E69C3EB43648F00E380225257D
+    hex 7F7B7BFBF8FC871F08400002EE04DE31
+    hex 1877A6A1037E7C7CBCBDBF7FC9F6EFE7
+    hex EBBF6D7FB69FCF3EDB8FF518671FF7F5
+    hex DF1FDF553FFB1A6396CF63FEB3BC42E1
+    hex 32B83B010CC61D69DC800F73D99BCCE8
+    hex DF2D9FED4D6B65933F0C636F3E47B147
+    hex E6B835B4BD31AECC1F479B913D086030
+    hex 1E1413C6B018C5F6BB96380C2641C89B
+    hex 4D81C134117C6614D147A4D9518A0EA6
+    hex 492125A789C1240357A79BDDF7181980
+    hex F76747F77FAC067374B4E288A45647DD
+    hex 380CA6AE363F329B7530DE2632BA5FE2
+    hex 61308F1BBE5B63C2609A14A3214D0CC6
+    hex 00EB955F8D3298FD9A9E7D5234EAB41E
+    hex A6B2729CE306EF2BABCD6FEE52067354
+    hex 9CCF2E7554A8A3F922E2466B51D7AE6E
+    hex C4ECB547CC37E299CDE5D93ABD6A3C06
+    hex 73A22C06730C26C22854D6184C7D5BC2  
+    hex 6030985F04D40D9F1D87C160302602DB
+    hex ABE357B19E5D2D2D9FAD16FD7ECC88B8
+    hex D52392D7FAD4F922D63ED2569D6F7F2F
+    hex 673F87A9F8FE7E59CD5399EB0E317430
+    hex 743074301B02EA11F00E66A1ACB1ACC1
+    hex 58AEE2EA954CBD5AA9716A47A1AE4F9D
+    hex 4FED28B2E32A715136DF1D62CA1A8C17 
+    hex FCD5A2DFCF1711B7BAE12D6BCF7E5AA2
+    hex 5EE123E2B80763A994D77C1783E188C4
+
+
+          
                 endif
                 if initialPattern == 2        ; Edge test
 initData        dc.b %11000000,%00000000,%00011000,%00000000,%00000011
@@ -550,7 +563,7 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth / (((COUT * CLICK))/.y)-4) ; first visible cell of the last row
+datapg0_lastRow equ . - dataWidth - fieldWidth / (((COUT * CLICK))/.y)) ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset / 12 + .y/2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
