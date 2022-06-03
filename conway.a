@@ -461,9 +461,9 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
                 repeat 23
                 dc.w .pg + (.y & %11111000) * 5 + ((.y & %00000111) << 7)
 .y              set .y + 1
-.CLICK          set HOME / .y + $100
-.COUT           set STACK + CLICK - 1
-		
+.CLICK          set .y + $100
+.COUT           set 1
+.y2             set .y + .y + 1		
                 repend
                 LOG_REGION "textRowsTable", textRowsTable, 0
 
@@ -587,11 +587,11 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset + STACK / .y + .y2]         ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset / .y + .y2]         ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .  
 		clc
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth + 13  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * HOME / CLICK + .y]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset / .y2 + 3]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
