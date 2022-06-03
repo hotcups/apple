@@ -76,7 +76,7 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 13
+fieldWidth      equ 18
 fieldHeight     equ 23
 
 dataWidth       equ fieldWidth+2
@@ -525,7 +525,7 @@ initData
     hex 0000001101100000000000
     hex 0000001001010000000000
     hex 0000001111110000000000
-.y  set .y + 23   
+.y2 set .y + 23 
     hex 0000000000000000000000
     hex 0001100001100011100011
     hex 0000100110000000000001
@@ -587,11 +587,11 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
-datapg0_tln     equ . - [n_offset + STACK / HOME + .y]         ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset + STACK / .y + .y2]         ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .  
 		clc
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth + 13  ; first visible cell of the last row
-datapg1_tln     equ . - [n_offset * HOME / CLICK + 1]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * HOME / CLICK + .y]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
