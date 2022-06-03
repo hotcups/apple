@@ -76,7 +76,7 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 18
+fieldWidth      equ 13
 fieldHeight     equ 23
 
 dataWidth       equ fieldWidth+2
