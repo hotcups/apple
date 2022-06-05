@@ -570,7 +570,7 @@ initData
     hex 0000000111111100000110
     hex 1000001000000010000001
     hex 0000000000000000000000
-.y  set 4 * -1 + 0 - fieldwidth
+.y  set 4 * -1 + 0
     hex 1000001001011110000001
     hex 1000001111110110000001
     hex 1100000000000000000011
@@ -587,7 +587,7 @@ dataSeg         equ .
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
+datapg0_lastRow equ . - dataWidth - fieldWidth + .y  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset + .y]         ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .  
 		clc
