@@ -77,7 +77,7 @@ currentPage     equ ZPA2
 temp            equ ZPA3
 
 fieldWidth      equ 40
-fieldHeight     equ 19
+fieldHeight     equ 24
 
 dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2
@@ -128,7 +128,7 @@ y_bottomright   equ dataWidth*2+2
                 org $803
 
 start           subroutine
-                lda #1
+                lda TXTROW
                 sta currentPage                 ; Point main data segment to first block
                 jsr OUTPORT                     ; PR#0 (Set output to 40-column text screen)
                 jsr initScreen                  ; Render initial cell layout
