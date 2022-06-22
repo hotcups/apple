@@ -76,7 +76,7 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 40
+fieldWidth      equ 26
 fieldHeight     equ 24
 
 dataWidth       equ fieldWidth+2
@@ -635,10 +635,10 @@ dataSeg         equ .
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
 datapg0_lastRow equ . - dataWidth - fieldWidth; first visible cell of the last row
-datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg0_tln     equ . - [n_offset * 2] + 23         ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
 datapg1         ds.b dataWidth * dataHeight     ; data page 1
 datapg1_lastRow equ . - dataWidth - fieldWidth ;first visible cell of the last row
-datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
+datapg1_tln     equ . - [n_offset * 2] + 13         ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
