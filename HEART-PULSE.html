@@ -28,10 +28,10 @@ ZPC2          equ $FC
 ZPC3          equ $FD
 
 STACK         equ $100
-
+CLICK         
+CLICK         equ $C030
 TXTPG0        equ $0400
 TXTPG1        equ $0800
-CLICK         equ $C030
 HOME          equ $FC58
 RDKEY         EQU $FD0C
 COUT          equ $FDED
@@ -438,7 +438,7 @@ getTextRow      subroutine
                 sta textRowH
                 rts
 
-rulesTable      dc.b charOff * -8
+rulesTable      dc.b charOn * -8
                 dc.b charOff           ;1
                 dc.b charOn / 70
                 dc.b charOff * -10           ;3
@@ -462,6 +462,11 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
 
                 if initialPattern == 0             ; Glider gun
 initData      
+CLICK set ZPC2 + 1 
+    dc.b %10100110
+    dc.b %01101110
+    dc.b %00001001
+    dc.b %11001101
     hex 0000000001010101000000
     hex 0100000001010000010101
     hex	1001101001000100010001
@@ -472,7 +477,9 @@ initData
     hex 0000001101100000000000
     hex 0000001001010000000000
     hex 0000001111110000000000
-    hex 0000000000000000000000
+    dc.w %0000000
+    dc.w %0000000
+    dc.b %0000000    
     hex 0001100001100011100011
     hex 0000100110000000000001
     hex 0101100001100011000101
@@ -496,7 +503,6 @@ initData
     hex 0001100000000000000100
     hex 0000011000011100110011
     hex 0000000000111110000001
-.y  set VTAB - dataHeight + 1 / HTAB + 1
     hex 1111110100101010000001
     hex 1111101000011100000001
     hex 0101011000101010000001
@@ -539,6 +545,11 @@ initData
     hex 0001100000000000000100
     hex 0000011000011100110011
     hex 0000000000111110000001
+    dc.b %11111101
+    dc.b %11111010
+    dc.b %01010110
+    dc.b %00101100
+.y  set 23 - 1    
     hex 1111110100101010000001
     hex 1111101000011100000001
     hex 0101011000101010000001
@@ -561,12 +572,7 @@ initData
     hex 1000001001011110000001
     hex 1000001111110110000001
     hex 1100000000000000000011
-.continue sec
-    hex 10100110011011100000100111001101
-    hex 01011001100100011111011000110010
-    hex 10110011100100000111011001100101
-    hex 1100000000000000000011
-    hex 1100000001100000000011
+    
     endif
 
 initDataLen     equ .-initData
