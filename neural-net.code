@@ -115,7 +115,7 @@ n_offset        equ dataWidth+1                 ; Alt data topleft offset from c
 y_topleft       equ 0                           ; Alt data pointer offsets
 y_top           equ 1
 y_topright      equ 2
-y_left          equ dataWidth
+y_left          equ dataWidth+1+1+1
 y_right         equ dataWidth+1+1
 y_bottomleft    equ dataWidth*4+1
 y_bottom        equ dataWidth*2+2
