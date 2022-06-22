@@ -442,14 +442,14 @@ getTextRow      subroutine
                 rts
 
 rulesTable      dc.b charOn                   ;0 neighbors
-                dc.b charOff                    ;1
+                dc.b charOn                   ;1
                 dc.b 0                          ;2
                 dc.b charOff                    ;3
                 dc.b charOff                    ;4
                 dc.b charOn                 ;5
-                dc.b charOff                    ;6
-                dc.b charOff                    ;7
-                dc.b charOff                    ;8
+                dc.b charOn                   ;6
+                dc.b charOn                    ;7
+                dc.b charOn                    ;8
 
 ; ------------------------------------
 ; Tables
