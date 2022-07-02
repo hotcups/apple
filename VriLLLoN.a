@@ -383,7 +383,7 @@ initScreen      subroutine
                 sta mainData
                 lda >#initData
                 sta mainDataH
-                lda #initDataLen-1              ; get data length
+                lda #initDataLen<$100             ; get data length
                 sta .dataoffset                 ; save it
                 lda #fieldHeight-1              ; load the field height
                 sta .row                        ; save in row counter
