@@ -52,7 +52,7 @@ EXITDOS       equ $03D0
 ; Build Options
 ; ------------------------------------
  
-NOISY           equ 1                          ; 0 = Sound off, 1 = Sound on
+NOISY           equ 1                           ; 0 = Sound off, 1 = Sound on
 CHARSET         equ 1                           ; 0 = Olde Skoole, 1 = Pixel, 2 = Inverse, 3 = Small O's, 4 = Enhanced
 INIT_PATTERN    equ 0                           ; 0 = Glider gun, 1 = "Random", 2 = Edge test
 TEST_PERF       equ 0                           ; 0 = Normal, 1 = Instrument for emulator cycle counting (forces Glider gun layout and sound off)
@@ -82,7 +82,7 @@ fieldHeight     equ 24
 dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2
 
-normalText      equ %11000000                   ; 'X | normalText
+normalText      equ %10000000                   ; 'X | normalText
 inverseText     equ %00111111                   ; 'X & inverseText
 
                 if CHARSET == 0
@@ -112,14 +112,14 @@ charOff         equ '  | normalText
 
 n_offset        equ dataWidth+1                 ; Alt data topleft offset from current cell
 
-y_topleft       equ 0                           ; Alt data pointer offsets
-y_top           equ 2
+y_topleft       equ 1                           ; Alt data pointer offsets
+y_top           equ 0
 y_topright      equ 1
-y_left          equ dataWidth*2          ; remove the 4 ones if you want basic mode
-y_right         equ dataWidth*2
-y_bottomleft    equ dataWidth+2
-y_bottom        equ dataWidth+4
-y_bottomright   equ dataHeight-6
+y_left          equ dataWidth
+y_right         equ dataWidth+2
+y_bottomleft    equ dataWidth*2
+y_bottom        equ dataWidth*2+1
+y_bottomright   equ dataWidth*2+2
 
 ; ------------------------------------
 ; Entry Point
@@ -156,7 +156,7 @@ perfTest        subroutine
 .break          jsr RDKEY
                 echo "Breakpoint:", .break
                 rts
-.counter        ds.b 0
+.counter        ds.b 1
                 echo "START TIMER BREAKPOINT:",.startTimer
                 echo "END TIMER BREAKPOINT:",.endTimer
 
@@ -208,16 +208,12 @@ iterate         subroutine
                 bne .clearTopLeft               ; cell is disabled, so clear the topleft neighbor
                 if soundEnabled
                 bit CLICK
-                bit fieldHeight
-                clc
                 endif
                 ldy #y_topleft                  ; set top left value to one (previous value is stale)
                 lda #1                          
                 sta (altData),y                 
                 if soundEnabled
-                bit CLICK
-                bit TXTROW
-                ; (Pretend I'm not here... I just click the speaker)
+                bit CLICK                       ; (Pretend I'm not here... I just click the speaker)
                 endif
                 clc
                 INCREMENT top                     
@@ -384,7 +380,7 @@ initScreen      subroutine
                 sta mainData
                 lda >#initData
                 sta mainDataH
-                lda #initDataLen-1              ; get data length
+                lda #initDataLen<$100             ; get data length
                 sta .dataoffset                 ; save it
                 lda #fieldHeight-1              ; load the field height
                 sta .row                        ; save in row counter
@@ -442,8 +438,8 @@ getTextRow      subroutine
                 sta textRowH
                 rts
 
-rulesTable      dc.b charOff                  ;0 neighbors
-                dc.b charOn                 ;1
+rulesTable      dc.b charOff                    ;0 neighbors
+                dc.b charOn                    ;1
                 dc.b 0                          ;2
                 dc.b charOn                     ;3
                 dc.b charOff                    ;4
@@ -465,8 +461,9 @@ textRowsTable   subroutine                      ; Lookup table for text page 0 r
                 LOG_REGION "textRowsTable", textRowsTable, 0
 
                 if initialPattern == 0             ; Glider gun
-initData      
+initData       
 
+		
     dc.b %000000000, %10101010, %000000000
     dc.b %010000000, %10100000, %101010000
     dc.b %100110100, %10001000, %100010000
@@ -565,9 +562,6 @@ initData
     dc.b %100000100, %10111100, %000010000
     dc.b %100000111, %11101100, %000010000
     dc.b %110000000, %00000000, %000110000
-
-
-
 		endif
                 if initialPattern == 1        ; "Random"
 initData        dc.b %00000000,%00000000,%00000000,%00000000,%00000000
@@ -624,12 +618,11 @@ initData        dc.b %11000000,%00000000,%00011000,%00000000,%00000011
 initDataLen     equ .-initData
 
 dataSeg         equ .
-                seg.u conwayData
-                   ; uninitialized data segment
+                seg.u conwayData                ; uninitialized data segment
                 org dataSeg
 
 datapg0         ds.b dataWidth * dataHeight     ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth ; first visible cell of the last row
+datapg0_lastRow equ . - dataWidth - fieldWidth  ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
