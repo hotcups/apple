@@ -217,6 +217,7 @@ iterate         subroutine
                 if soundEnabled
                 bit CLICK
                 bit TXTROW
+                
                 ; (Pretend I'm not here... I just click the speaker)
                 endif
                 clc
