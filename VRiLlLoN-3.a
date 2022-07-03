@@ -117,7 +117,7 @@ y_top           equ 1
 y_topright      equ 2
 y_left          equ dataWidth/2
 y_right         equ dataWidth*2
-y_bottomleft    equ dataWidth*4
+y_bottomleft    equ dataWidth*2
 y_bottom        equ dataWidth*2+1 
 y_bottomright   equ dataWidth/6
 
