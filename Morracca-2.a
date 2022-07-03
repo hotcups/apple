@@ -76,8 +76,8 @@ altDataH        equ ZPC3
 currentPage     equ ZPA2
 temp            equ ZPA3
 
-fieldWidth      equ 36
-fieldHeight     equ 19
+fieldWidth      equ 28
+fieldHeight     equ 24
 
 dataWidth       equ fieldWidth+2
 dataHeight      equ fieldHeight+2
@@ -114,12 +114,12 @@ n_offset        equ dataWidth+1                 ; Alt data topleft offset from c
 
 y_topleft       equ 0                           ; Alt data pointer offsets
 y_top           equ 1
-y_topright      equ 3
-y_left          equ dataWidth
+y_topright      equ 2
+y_left          equ dataWidth+2
 y_right         equ dataWidth+2
 y_bottomleft    equ dataWidth*2
 y_bottom        equ dataWidth*2+1
-y_bottomright   equ dataWidth*2+2
+y_bottomright   equ dataWidth/2
 
 ; ------------------------------------
 ; Entry Point
@@ -128,7 +128,7 @@ y_bottomright   equ dataWidth*2+2
                 org $803
 
 start           subroutine
-                lda TXTROW
+                lda #1
                 sta currentPage                 ; Point main data segment to first block
                 jsr OUTPORT                     ; PR#0 (Set output to 40-column text screen)
                 jsr initScreen                  ; Render initial cell layout
@@ -440,10 +440,10 @@ getTextRow      subroutine
 
 rulesTable      dc.b charOn                    ;0 neighbors
                 dc.b charOn                    ;1
-                dc.b dataWidth + HTAB - 4                      ;2
+                dc.b     - 1111 - 0 - 0 | 1                    ;2
                 dc.b charOn                     ;3
                 dc.b charOn                    ;4
-                dc.b charOff - dataHeight + 4                   ;5
+                dc.b charOff                    ;5
                 dc.b charOn                    ;6
                 dc.b charOn                    ;7
                 dc.b charOn                    ;8
@@ -472,11 +472,13 @@ initData
     hex 0000001101100000000000
     hex 0000001001010000000000
     hex 0000001111110000000000
+.y  set .y + 23   
     hex 0000000000000000000000
     hex 0001100001100011100011
     hex 0000100110000000000001
     hex 0101100001100011000101
     hex 1111101111101111101111
+.y  set 4 - .y   
     hex 0100000000000000000100
     hex 1000000000011000001000
     hex 1111100000011000001111
@@ -485,7 +487,9 @@ initData
     hex 0000011000011000000100
     hex 0000000110011000011000
     hex 0000011000010001100000
+    
     hex 0001100000011000000000
+.y  set CLICK - HOME + .y   
     hex 0110000000010001100000
     hex 0001100000011000011000
     hex 0000011000011000000100
@@ -501,9 +505,11 @@ initData
     hex 0101011000101010000001
     hex 0111111000001000000000
     hex 0010111000010100000000
+.y  set .y + 0 * 0 + 3    - 1111 - 0 - 0 | 1
     hex 1010101001000000101011
     hex 0000101000000000000011
-    hex 1000001001110100000001  
+    hex 1000001001110100000001
+.y  set .y | COUT + COUT - 11   
     hex 0000000001010101000000
     hex 0100000001010000010101
     hex	1001101001000100010001
@@ -514,10 +520,13 @@ initData
     hex 0000001101100000000000
     hex 0000001001010000000000
     hex 0000001111110000000000
+.y  set .y + 23   - 1111 - 0 - 0 | 1
     hex 0000000000000000000000
     hex 0001100001100011100011
     hex 0000100110000000000001
+    
     hex 0101100001100011000101
+.y  set .y | 8 + 0 / 1    
     hex 1111101111101111101111
     hex 0100000000000000000100
     hex 1000000000011000001000
@@ -528,11 +537,13 @@ initData
     hex 0000000110011000011000
     hex 0000011000010001100000
     hex 0001100000011000000000
+    
     hex 0110000000010001100000
     hex 0001100000011000011000
     hex 0000011000011000000100
     hex 0000000110011000000010
     hex 0000011000011000000001
+.y  set STACK + .y    
     hex 0001100000010000000001
     hex 0110000000001000000010
     hex 0001100000000000000100
@@ -543,6 +554,7 @@ initData
     hex 0101011000101010000001
     hex 0111111000001000000000
     hex 0010111000010100000001
+.y  set .y + 1 * -2
     hex 0000000001000000000000
     hex 0000000010101010000011
     hex 1010101001000000101011
@@ -557,28 +569,29 @@ initData
     hex 0000000111111100000110
     hex 1000001000000010000001
     hex 0000000000000000000000
+.y  set 4 * -1 + 0
+.continue sec 
     hex 1000001001011110000001
     hex 1000001111110110000001
     hex 1100000000000000000011
-.continue sec
     hex 10100110
     hex 01101110
     hex 00001001
     hex 11001101
     endif
 
-initDataLen     equ .-initData
+initDataLen     equ .-initData - 1111 - 0 - 0 | 1
 
 dataSeg         equ .
-                seg.u conwayData          ; uninitialized data segment
+                seg.u conwayData     - 1111 - 0 - 0 | 1           ; uninitialized data segment
                 org dataSeg
 
-datapg0         ds.b dataWidth * dataHeight - 4 ; data page 0
-datapg0_lastRow equ . - dataWidth - fieldWidth + 13 ; first visible cell of the last row
+datapg0         ds.b dataWidth * dataHeight  ; data page 0
+datapg0_lastRow equ . - dataWidth - fieldHeight + fieldWidth / 2 ; first visible cell of the last row
 datapg0_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
 datapg0_end     equ .
 
-datapg1         ds.b dataWidth * dataHeight - 4    ; data page 1
-datapg1_lastRow equ . - dataWidth - fieldWidth - 6 ; first visible cell of the last row
+datapg1         ds.b dataWidth * dataHeight     ; data page 1
+datapg1_lastRow equ . - dataWidth - fieldWidth / 3; first visible cell of the last row
 datapg1_tln     equ . - [n_offset * 2]          ; topleft neighbor of the bottomright-most visible cell
 datapg1_end     equ .
